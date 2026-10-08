@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>For Deepikka</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,500;1,600&family=EB+Garamond:ital,wght@0,400;0,600;1,400&family=Dancing+Script:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --burgundy:#3a1123; --burgundy-2:#5a1c38; --burgundy-3:#7a2547; --plum:#6b2d5c;
+  --gold:#c9a24b; --gold-soft:#eeddab; --parchment:#f6ecd4; --parchment-2:#eaddba;
+  --ink:#2c1a22;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+*{box-sizing:border-box;}
+html,body{height:100%;margin:0;}
+body{
+  font-family:'EB Garamond',serif;
+  background:
+    radial-gradient(ellipse at 50% 0%,#33101f 0%,#1a0910 55%,#0f0509 100%);
+  color:var(--parchment); min-height:100%;
+  display:flex; align-items:center; justify-content:center;
+  padding:8px; overflow-x:hidden;
+}
+.stage{ width:min(99vw,1350px); perspective:3000px; position:relative; }
+
+/* ---------- Front cover ---------- */
+.cover-wrap{ position:relative; width:min(50vw,700px); aspect-ratio:3/4; max-height:85vh; margin:0 auto; }
+.cover{
+  position:absolute; inset:0; border-radius:3px 8px 8px 3px; cursor:pointer;
+  transform-origin:left center; transform:rotateY(0deg);
+  transition:transform .9s cubic-bezier(.45,.05,.2,1), opacity .3s ease .55s;
+  background:
+    radial-gradient(120% 100% at 15% 10%, var(--burgundy-3) 0%, var(--burgundy-2) 40%, var(--burgundy) 75%, #240912 100%);
+  box-shadow:0 30px 70px rgba(0,0,0,.6), inset 0 0 0 2px rgba(201,162,75,.4), inset 0 0 50px rgba(0,0,0,.5);
+  display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center;
+  padding:10% 8%; backface-visibility:hidden; z-index:90;
+}
+.cover::before{ content:""; position:absolute; inset:14px; border:2px solid var(--gold); border-radius:4px; pointer-events:none; }
+.cover::after{ content:"❧"; position:absolute; bottom:20px; font-size:16px; color:var(--gold); opacity:.55; }
+.corner{ position:absolute; font-size:13px; color:var(--gold); opacity:.5; }
+.corner.tl{ top:22px; left:22px; } .corner.tr{ top:22px; right:22px; }
+.cover .paw{ font-size:24px; opacity:.9; margin-bottom:16px; letter-spacing:6px; }
+.cover h1{ font-family:'Dancing Script',cursive; font-size:clamp(34px,7vw,52px); font-weight:700; color:var(--gold-soft); margin:0 0 8px; text-shadow:0 2px 10px rgba(0,0,0,.4); }
+.cover .sub{ font-style:italic; color:var(--parchment-2); font-size:clamp(13px,2.2vw,16px); opacity:.85; margin-bottom:30px; font-variant:small-caps; letter-spacing:1px; }
+.cover .hint{ font-size:12px; letter-spacing:2px; color:var(--gold); opacity:.75; animation:pulse 2.4s ease-in-out infinite; font-variant:small-caps; }
+@keyframes pulse{ 0%,100%{opacity:.4;} 50%{opacity:.9;} }
+.cover-wrap.open .cover{ transform:rotateY(-172deg); opacity:0; }
+
+/* ---------- Open book ---------- */
+.book{ position:absolute; inset:0; opacity:0; pointer-events:none; transition:opacity .3s ease .5s; display:flex; align-items:center; justify-content:center; }
+.cover-wrap.open .book{ opacity:1; pointer-events:auto; }
+
+.hardcover{
+  position:relative;
+
+  /* About 70% of viewport width */
+  width:70vw;
+
+  /* Keep the book from becoming tiny or gigantic */
+  min-width:900px;
+  max-width:1400px;
+
+  aspect-ratio:8/5.3;
+
+  /* Allow it to use most of the screen height */
+  max-height:90vh;
+
+  background:linear-gradient(
+    155deg,
+    var(--burgundy-3) 0%,
+    var(--burgundy-2) 45%,
+    var(--burgundy) 100%
+  );
+
+  border-radius:8px;
+  padding:2.1%;
+
+  box-shadow:
+    0 30px 70px rgba(0,0,0,.6),
+    inset 0 0 0 1.5px rgba(201,162,75,.45),
+    inset 0 0 30px rgba(0,0,0,.4);
+}
+.hardcover .corner{ font-size:14px; }
+.hardcover .corner.tl{ top:10px; left:14px; } .hardcover .corner.tr{ top:10px; right:14px; }
+.hardcover .corner.bl{ bottom:10px; left:14px; } .hardcover .corner.br{ bottom:10px; right:14px; }
+
+.pages-row{ position:absolute; inset:0; display:flex; width:100%; height:100%; border-radius:3px; overflow:hidden;
+  box-shadow:0 12px 34px rgba(0,0,0,.45); transition:opacity .45s ease; }
+.pages-row.hide{ opacity:0; pointer-events:none; }
+.page{ position:relative; width:50%; height:100%; background:linear-gradient(100deg,var(--parchment) 0%,var(--parchment-2) 100%);
+  color:var(--ink); overflow:hidden; }
+.page-inner{ position:absolute; inset:0; padding:6% 6.5%; display:flex; flex-direction:column; background:linear-gradient(100deg,var(--parchment) 0%,var(--parchment-2) 100%); min-height:0; }
+.page-inner::before{ content:""; position:absolute; inset:8px; border:1px solid rgba(107,45,92,.28); pointer-events:none; }
+
+.gutter{ position:absolute; left:50%; top:0; bottom:0; width:22px; margin-left:-11px; z-index:40; pointer-events:none;
+  background:linear-gradient(90deg, transparent, rgba(40,14,24,.35) 45%, rgba(40,14,24,.35) 55%, transparent); }
+.gutter::before,.gutter::after{ content:""; position:absolute; left:50%; width:1px; top:6%; bottom:6%; background:repeating-linear-gradient(180deg, rgba(201,162,75,.5) 0 3px, transparent 3px 9px); }
+.gutter::before{ margin-left:-5px; } .gutter::after{ margin-left:4px; }
+
+.gilt-l,.gilt-r{ position:absolute; top:2%; bottom:2%; width:6px; z-index:5;
+  background:repeating-linear-gradient(180deg,#dcb862 0 2px,#c79c48 2px 3px); }
+.gilt-l{ left:0; border-radius:3px 0 0 3px; } .gilt-r{ right:0; border-radius:0 3px 3px 0; }
+
+/* left page decorative */
+.lp-roman{ font-size:15px; letter-spacing:3px; color:var(--plum); opacity:.6; font-variant:small-caps; margin-bottom:auto; flex-shrink:0; text-align:center; }
+.lp-center{ margin:auto 0; text-align:center; }
+.lp-flourish{ font-size:18px; color:var(--gold); opacity:.7; margin-bottom:12px; }
+.lp-title{ font-family:'Dancing Script',cursive; font-size:clamp(28px,4.5vw,42px); color:var(--burgundy-2); line-height:1.15; margin-bottom:8px; }
+.lp-teaser{ font-family:'Cormorant Garamond',serif; font-style:italic; font-size:clamp(12px,1.8vw,14px); color:var(--plum); opacity:.85; }
+.lp-bottom{ text-align:center; font-size:14px; opacity:.4; letter-spacing:4px; margin-top:auto; flex-shrink:0; }
+
+/* right page text */
+.eyebrow{ font-size:11px; color:var(--plum); opacity:.65; font-variant:small-caps; letter-spacing:2px; margin-bottom:4px; flex-shrink:0; }
+.ptitle{ font-family:'Cormorant Garamond',serif; font-size:clamp(24px,3.5vw,34px); font-weight:600; color:var(--burgundy-2); margin:0 0 3%; flex-shrink:0; }
+.rule{ width:40px; height:2px; background:var(--gold); margin-bottom:4%; flex-shrink:0; }
+.body{ flex:1; min-height:0; overflow:hidden; font-size:clamp(16px,1.8vw,20px); line-height:1.7; }
+.body p{ margin:0 0 .6em; }
+.body p:first-of-type::first-letter{ font-family:'Cormorant Garamond',serif; font-size:2em; font-weight:600; color:var(--burgundy-2); float:left; line-height:.85; padding-right:.07em; }
+.verse{ margin:0 0 .3em; } .verse.v1{ font-size:.93em; opacity:.72;} .verse.v2{ font-size:1.02em; opacity:.85;} .verse.v3{ font-size:1.1em; opacity:.95;}
+.verse.v4{ font-family:'Cormorant Garamond',serif; font-style:italic; font-size:1.22em; color:var(--burgundy-2); margin-top:.4em; }
+.pull{ font-family:'Cormorant Garamond',serif; font-style:italic; font-size:1.12em; color:var(--plum); margin:.4em 0; }
+.sign{ margin-top:.5em; font-family:'Dancing Script',cursive; font-size:23px; color:var(--burgundy-2); }
+.moon{ font-size:1.3em; }
+.stat{ display:flex; justify-content:space-between; gap:10px; border-bottom:1px dotted rgba(107,45,92,.35); padding:.4em 0; font-size:clamp(15px,1.7vw,18px); }
+.stat span:first-child{ font-variant:small-caps; letter-spacing:.4px; color:var(--burgundy-2); }
+.stat span:last-child{ font-style:italic; text-align:right; }
+.folio{ display:flex; align-items:center; justify-content:center; margin-top:3%; padding-top:2.5%; border-top:1px solid rgba(107,45,92,.25); flex-shrink:0; }
+.folio .num{ font-size:10.5px; letter-spacing:1px; color:var(--plum); opacity:.7; font-variant:small-caps; }
+
+/* end page */
+.end-wrap{ margin:auto; text-align:center; }
+.end-wrap .flourish{ font-size:22px; color:var(--gold); opacity:.7; margin-bottom:16px; }
+.end-wrap h2{ font-family:'Dancing Script',cursive; font-size:clamp(30px,5.6vw,46px); color:var(--burgundy-2); margin:0 0 10px; }
+.end-wrap p{ font-family:'Cormorant Garamond',serif; font-style:italic; color:var(--plum); font-size:14px; }
+
+/* back cover */
+.back-cover{
+  position:absolute; inset:0; opacity:0; pointer-events:none; transition:opacity .5s ease; border-radius:3px; overflow:hidden;
+  background:radial-gradient(120% 100% at 85% 90%, var(--burgundy-3) 0%, var(--burgundy-2) 40%, var(--burgundy) 75%, #240912 100%);
+  display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; color:var(--parchment);
+  box-shadow:inset 0 0 0 2px rgba(201,162,75,.4), inset 0 0 50px rgba(0,0,0,.5);
+}
+.back-cover.show{ opacity:1; pointer-events:auto; }
+.back-cover::before{ content:""; position:absolute; inset:14px; border:2px solid var(--gold); border-radius:4px; pointer-events:none; }
+.back-cover .paw{ font-size:20px; opacity:.85; margin-bottom:14px; letter-spacing:6px; }
+.back-cover h2{ font-family:'Dancing Script',cursive; font-size:clamp(30px,6vw,48px); color:var(--gold-soft); margin:0 0 10px; text-shadow:0 2px 10px rgba(0,0,0,.4); }
+.back-cover p{ font-style:italic; color:var(--parchment-2); font-size:clamp(12px,2vw,15px); opacity:.85; font-variant:small-caps; letter-spacing:1px; }
+.back-cover .flourish{ font-size:18px; color:var(--gold); opacity:.7; margin-top:16px; }
+
+/* flipper */
+.flip-zone{ position:absolute; inset:0; perspective:2200px; pointer-events:none; }
+.flipper{ position:absolute; inset:0; transform-origin:left center; transform-style:preserve-3d; transition:transform .8s cubic-bezier(.4,.1,.2,1); pointer-events:auto; }
+.flipper.notransition{ transition:none; }
+.flip-face{ position:absolute; inset:0; backface-visibility:hidden; background:linear-gradient(100deg,var(--parchment) 0%,var(--parchment-2) 100%); }
+.flip-face.back{ transform:rotateY(180deg); display:flex; align-items:center; justify-content:center; }
+.flip-face.back .motif{ font-size:20px; opacity:.28; color:var(--plum); }
+.flip-shade{ position:absolute; inset:0; background:linear-gradient(90deg, rgba(0,0,0,.18), transparent 35%); opacity:0; transition:opacity .8s; pointer-events:none; }
+.flipper.turning .flip-shade{ opacity:1; }
+
+.fade{ transition:opacity .35s ease; }
+.fade.out{ opacity:0; }
+
+/* arrows */
+.arrow{
+  position:absolute; top:50%; transform:translateY(-50%); z-index:100;
+  width:46px; height:46px; border-radius:50%; border:1.5px solid rgba(201,162,75,.6);
+  background:radial-gradient(circle at 35% 30%, var(--burgundy-3), var(--burgundy) 70%);
+  color:var(--gold-soft); font-size:20px; display:flex; align-items:center; justify-content:center;
+  cursor:pointer; box-shadow:0 8px 20px rgba(0,0,0,.5); transition:opacity .2s, transform .2s;
+}
+.arrow:hover{ transform:translateY(-50%) scale(1.08); }
+.arrow.left{ left:-55px; } .arrow.right{ right:-55px; }
+.arrow[disabled]{ opacity:0; pointer-events:none; }
+@media (max-width:640px){ .arrow{ width:36px; height:36px; font-size:16px; } .arrow.left{ left:-38px; } .arrow.right{ right:-38px; } }
+
+.ribbon{
+  position:absolute; top:-3px; left:26px; z-index:110;
+  background:var(--burgundy-2); color:var(--gold-soft); border:none;
+  font-family:'EB Garamond',serif; font-variant:small-caps; letter-spacing:1px; font-size:12.5px;
+  padding:7px 13px 9px; border-radius:0 0 5px 5px; cursor:pointer;
+  box-shadow:0 6px 10px rgba(0,0,0,.35);
+}
+.ribbon:hover{ background:var(--plum); }
+
+/* Floating background */
+.floating-bg{
+  position:fixed;
+  inset:0;
+  overflow:hidden;
+  pointer-events:none;
+  z-index:0;
+}
+
+.floating-bg span{
+  position:absolute;
+  bottom:-80px;
+
+  font-size:32px;
+  opacity:.28;
+
+  animation:floatUp linear infinite;
+  filter:blur(.3px);
+}
+
+.floating-bg span:nth-child(1){ left:8%;  animation-duration:12s; }
+.floating-bg span:nth-child(2){ left:18%; animation-duration:15s; }
+.floating-bg span:nth-child(3){ left:28%; animation-duration:13s; }
+.floating-bg span:nth-child(4){ left:38%; animation-duration:16s; }
+.floating-bg span:nth-child(5){ left:48%; animation-duration:14s; }
+.floating-bg span:nth-child(6){
+  left:58%;
+  animation-duration:23s;
+}
+
+.floating-bg span:nth-child(7){
+  left:68%;
+  animation-duration:21s;
+}
+
+.floating-bg span:nth-child(8){
+  left:78%;
+  animation-duration:24s;
+}
+
+.floating-bg span:nth-child(9){
+  left:88%;
+  animation-duration:20s;
+}
+
+.floating-bg span:nth-child(10){
+  left:95%;
+  animation-duration:26s;
+}
+.floating-bg span:nth-child(11){ left:12%; animation-duration:17s; }
+.floating-bg span:nth-child(12){ left:22%; animation-duration:21s; }
+.floating-bg span:nth-child(13){ left:32%; animation-duration:19s; }
+.floating-bg span:nth-child(14){ left:42%; animation-duration:24s; }
+.floating-bg span:nth-child(15){ left:52%; animation-duration:18s; }
+.floating-bg span:nth-child(16){ left:72%; animation-duration:22s; }
+
+@keyframes floatUp{
+  0%{
+    transform:translateY(0) rotate(0deg);
+    opacity:0;
+  }
+
+  10%{
+    opacity:.18;
+  }
+
+  90%{
+    opacity:.18;
+  }
+
+  100%{
+    transform:translateY(-120vh) rotate(360deg);
+    opacity:0;
+  }
+}
+
+body::before{
+  content:"";
+  position:fixed;
+  inset:0;
+
+  background:
+    radial-gradient(
+      circle at center,
+      rgba(168,85,247,.18) 0%,
+      transparent 55%
+    );
+
+  pointer-events:none;
+}
+
+#pawFollower{
+  position:fixed;
+  left:0;
+  top:0;
+
+  font-size:34px;
+
+  pointer-events:none;
+  user-select:none;
+
+  z-index:9999;
+
+  transform:translate(-50%, -50%) rotate(-15deg);
+
+  filter:
+    drop-shadow(0 0 8px rgba(168,85,247,.6));
+}
+#musicButton{
+  position:fixed;
+  right:24px;
+  bottom:24px;
+  z-index:10000;
+
+  padding:10px 18px;
+  border:1px solid rgba(201,162,75,.7);
+  border-radius:30px;
+
+  background:rgba(58,17,35,.9);
+  color:var(--gold-soft);
+
+  font-family:'EB Garamond',serif;
+  font-size:15px;
+  letter-spacing:1px;
+
+  cursor:pointer;
+
+  box-shadow:
+    0 6px 20px rgba(0,0,0,.45),
+    0 0 12px rgba(168,85,247,.2);
+
+  backdrop-filter:blur(6px);
+
+  transition:
+    transform .2s ease,
+    background .2s ease,
+    box-shadow .2s ease;
+}
+
+#musicButton:hover{
+  transform:scale(1.06);
+  background:rgba(90,28,56,.95);
+  box-shadow:
+    0 8px 24px rgba(0,0,0,.5),
+    0 0 16px rgba(168,85,247,.35);
+}
+
+#musicButton.playing{
+  border-color:rgba(168,85,247,.8);
+}
+
+@media(max-width:640px){
+  #musicButton{
+    right:16px;
+    bottom:16px;
+    padding:9px 15px;
+    font-size:14px;
+  }
+}
+</style>
+</head>
+<body>
+
+<div class="floating-bg">
+  <span>🐾</span>
+  <span>💜</span>
+  <span>🐾</span>
+  <span>💜</span>
+  <span>🐾</span>
+  <span>💜</span>
+  <span>🐾</span>
+  <span>💜</span>
+  <span>🐾</span>
+  <span>💜</span>
+  <span>🐾</span>
+  <span>💜</span>
+  <span>🐾</span>
+  <span>💜</span>
+  <span>🐾</span>
+  <span>💜</span>
+</div>
+
+<div class="stage">
+  <div class="cover-wrap" id="coverWrap">
+    <div class="cover" id="cover" role="button" tabindex="0" aria-label="Open the book">
+      <div class="corner tl">❧</div><div class="corner tr">❧</div>
+      <div class="paw">🫶🏼 &nbsp; 🐾</div>
+      <h1>A Small Note<br>
+ 	 <span class="of">of</span><br>
+ 	 Appreciation
+      </h1>
+      <div class="sub">From Sanjay</div>
+      <div class="hint">tap to open</div>
+    </div>
+
+    <div class="book" id="book">
+      <div class="hardcover">
+        <button class="arrow left" id="arrowLeft" aria-label="Previous page">‹</button>
+        <button class="arrow right" id="arrowRight" aria-label="Next page">›</button>
+        <div class="corner tl">❧</div><div class="corner tr">❧</div><div class="corner bl">❧</div><div class="corner br">❧</div>
+        <button class="ribbon" id="closeBtn">✦ cover</button>
+        <div class="pages-row" id="pagesRow">
+          <div class="gilt-l"></div>
+          <div class="page" id="leftPage"><div class="page-inner fade" id="leftInner"></div></div>
+          <div class="gutter"></div>
+          <div class="page" id="rightPage">
+            <div class="page-inner" id="rightBase"></div>
+            <div class="flip-zone"><div class="flipper" id="flipper">
+              <div class="flip-face front page-inner" id="flipFront"></div>
+              <div class="flip-face back"><div class="motif">🐾 &nbsp; 🫶🏼 &nbsp; 🐾</div></div>
+              <div class="flip-shade"></div>
+            </div></div>
+          </div>
+          <div class="gilt-r"></div>
+        </div>
+        <div class="back-cover" id="backCover">
+          <div class="paw">🫶🏼 &nbsp; 🐾</div>
+          <h2>The End</h2>
+          <p>with love, Sanjay</p>
+          <div class="flourish">❧</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div id="pawFollower">🐾</div>
+<audio id="bgMusic" loop>
+  <source src="orumaalai.mp3" type="audio/mpeg">
+</audio>
+
+<button id="musicButton">▶ Play</button>
+<script>
+const roman = ["i","ii","iii","iv","v","vi"];
+const sections = [
+{ label:"Hi 8ballexpert54 👋", title:"So Here\nIt Is", teaser:"a small something, just for you", body:`
+  <p>I know you're probably wondering why I made yet another thing. The truth is, I just wanted to create something that could make you smile.</p>
+  <p>If you're reading this, you've probably already opened everything else. Which means you've also read the letter.</p>
+  <p class="pull">First of all — thank you.</p>
+  <p>Not for feeling any particular way. Not for having an answer. Just for taking the time to read it.</p>`},
+{ label:"Two Years", title:"Two\nYears", teaser:"two years, in fragments", body:`
+  <p class="verse v1">It's honestly a little crazy to think</p>
+  <p class="verse v2">that it's been about two years.</p>
+  <p class="verse v2">Two years of conversations.</p>
+  <p class="verse v3">Two years of random messages.</p>
+  <p class="verse v3">Two years of looking forward to seeing your name appear on my screen.</p>
+  <p class="verse v4">And somehow, today was the first time we actually met properly.</p>`},
+{ label:"Today", title:"Today", teaser:"a day I'll remember", body:`
+  <p>I don't know what part of today you'll remember most.</p>
+  <p class="verse v1">Maybe the food.</p>
+  <p class="verse v2">Maybe the skating.</p>
+  <p class="verse v2">Maybe something funny that happened.</p>
+  <p class="verse v1">Maybe nothing at all.</p>
+  <p class="verse v4">But for me, today is something I'll remember for a very long time.</p>
+  <p>Because after two years of texts and calls, I finally got to spend time with you in person. And that meant a lot to me.</p>`},
+{ label:"One More Thing", title:"One More\nThing", teaser:"no twists, just gratitude", body:`
+  <p>The letter already said everything I wanted to say.</p>
+  <p class="verse v1">So there's no second confession hidden here.</p>
+  <p class="verse v1">No plot twist.</p>
+  <p class="verse v1">No secret ending.</p>
+  <p class="pull">Just one thing —</p>
+  <p>Thank you for being someone who made these past two years brighter than they would've been otherwise.</p>`},
+{ label:"Before You Go…", title:"Before\nYou Go", teaser:"goodnight, and thank you", body:`
+  <p>Whether this website ends up being something you revisit, or something you never open again…</p>
+  <p class="pull">I'm glad you're here right now.</p>
+  <p><span class="moon">🌙</span> Goodnight, Deepikka.</p>
+  <p>And thank you for today.</p>
+  <p style="opacity:.7">🫶🏼 &nbsp; 🐾</p>
+  <div class="sign">— Sanjay</div>`},
+{ label:"Statistics 📊", title:"By the\nNumbers", teaser:"the numbers don't lie", body:`
+  <div class="stat"><span>Times you've made me smile</span><span>Error 404 — too large to calculate</span></div>
+  <div class="stat"><span>Times you've called me porukki</span><span>Top secret government info</span></div>
+  <div class="stat"><span>Amount of purple in this website</span><span>Yes.</span></div>
+  <div class="stat"><span>Chance of a website for anyone else</span><span>≈ 0%</span></div>`}
+];
+const N = sections.length; // spreads 0..N-1 are content, spread N is the end
+let idx = 0;
+
+function toRoman(num){
+  const vals=[[1000,"m"],[900,"cm"],[500,"d"],[400,"cd"],[100,"c"],[90,"xc"],[50,"l"],[40,"xl"],[10,"x"],[9,"ix"],[5,"v"],[4,"iv"],[1,"i"]];
+  let r="";
+  for(const [v,s] of vals){ while(num>=v){ r+=s; num-=v; } }
+  return r;
+}
+function leftHTML(i){
+  const s = sections[i];
+  const num = i*2+1;
+  return `<div class="lp-roman">${toRoman(num)}</div>
+    <div class="lp-center"><div class="lp-flourish">❧</div>
+      <div class="lp-title">${s.title.replace("\n","<br>")}</div>
+      <div class="lp-teaser">${s.teaser}</div></div>
+    <div class="lp-bottom">· · ·</div>`;
+}
+function rightHTML(i){
+  const s = sections[i];
+  const num = i*2+2;
+  return `<div class="eyebrow">${s.label}</div><h2 class="ptitle">${s.title.replace("\n"," ")}</h2><div class="rule"></div>
+    <div class="body">${s.body}</div>
+    <div class="folio"><span class="num">${toRoman(num)}</span></div>`;
+}
+
+const leftInner = document.getElementById('leftInner');
+const rightBase = document.getElementById('rightBase');
+const flipper = document.getElementById('flipper');
+const flipFront = document.getElementById('flipFront');
+const arrowLeft = document.getElementById('arrowLeft');
+const arrowRight = document.getElementById('arrowRight');
+const pagesRow = document.getElementById('pagesRow');
+const backCover = document.getElementById('backCover');
+let atEnd = false;
+
+function paint(i){
+  leftInner.innerHTML = leftHTML(i);
+  flipFront.innerHTML = rightHTML(i);
+  rightBase.innerHTML = i < N-1 ? rightHTML(i+1) : "";
+  arrowLeft.disabled = i===0;
+  arrowRight.disabled = false;
+}
+paint(idx);
+
+function withNoTransition(el, fn){
+  el.classList.add('notransition'); fn(); void el.offsetWidth; el.classList.remove('notransition');
+}
+function goToBackCover(){
+  pagesRow.classList.add('hide');
+  backCover.classList.add('show');
+  atEnd = true;
+  arrowRight.disabled = true;
+  arrowLeft.disabled = false;
+}
+function leaveBackCover(){
+  backCover.classList.remove('show');
+  pagesRow.classList.remove('hide');
+  atEnd = false;
+  arrowRight.disabled = false;
+  arrowLeft.disabled = idx===0;
+}
+function next(){
+  if(atEnd) return;
+  if(idx>=N-1){ goToBackCover(); return; }
+  rightBase.innerHTML = rightHTML(idx+1);
+  flipper.classList.add('turning');
+  flipper.style.transform = 'rotateY(-178deg)';
+  leftInner.classList.add('out');
+  setTimeout(()=>{ leftInner.innerHTML = leftHTML(idx+1); leftInner.classList.remove('out'); }, 300);
+  flipper.addEventListener('transitionend', function h(){
+    flipper.removeEventListener('transitionend',h);
+    idx++;
+    withNoTransition(flipper, ()=>{ flipper.style.transform='rotateY(0deg)'; flipper.classList.remove('turning'); });
+    flipFront.innerHTML = rightHTML(idx);
+    rightBase.innerHTML = idx<N-1 ? rightHTML(idx+1) : "";
+    arrowLeft.disabled = idx===0;
+  }, { once:true });
+}
+function prev(){
+  if(atEnd){ leaveBackCover(); return; }
+  if(idx<=0) return;
+  flipFront.innerHTML = rightHTML(idx-1);
+  rightBase.innerHTML = rightHTML(idx);
+  withNoTransition(flipper, ()=>{ flipper.style.transform='rotateY(-178deg)'; });
+  flipper.classList.add('turning');
+  leftInner.classList.add('out');
+  setTimeout(()=>{ leftInner.innerHTML = leftHTML(idx-1); leftInner.classList.remove('out'); }, 300);
+  requestAnimationFrame(()=> requestAnimationFrame(()=>{
+    flipper.style.transform = 'rotateY(0deg)';
+  }));
+  flipper.addEventListener('transitionend', function h(){
+    flipper.removeEventListener('transitionend',h);
+    idx--;
+    flipper.classList.remove('turning');
+    rightBase.innerHTML = idx<N-1 ? rightHTML(idx+1) : "";
+    arrowLeft.disabled = idx===0;
+  }, { once:true });
+}
+arrowRight.addEventListener('click', next);
+arrowLeft.addEventListener('click', prev);
+
+const coverWrap = document.getElementById('coverWrap');
+const cover = document.getElementById('cover');
+function openBook(){ coverWrap.classList.add('open'); }
+function closeBook(){
+  idx=0; atEnd=false;
+  backCover.classList.remove('show'); pagesRow.classList.remove('hide');
+  paint(0);
+  coverWrap.classList.remove('open');
+}
+cover.addEventListener('click', openBook);
+cover.addEventListener('keypress', e=>{ if(e.key==='Enter'||e.key===' ') openBook(); });
+document.getElementById('closeBtn').addEventListener('click', closeBook);
+
+const paw = document.getElementById('pawFollower');
+
+let mouseX = window.innerWidth / 2;
+let mouseY = window.innerHeight / 2;
+
+let pawX = mouseX;
+let pawY = mouseY;
+
+document.addEventListener('mousemove', (e) => {
+  mouseX = e.clientX;
+  mouseY = e.clientY;
+});
+
+function animatePaw() {
+  const offsetX = 25; // move paw 25px to the right
+  const offsetY = 10; // move paw 10px down
+
+  pawX += (mouseX - pawX) * 0.08;
+  pawY += (mouseY - pawY) * 0.08;
+
+  paw.style.left = (pawX + offsetX) + 'px';
+  paw.style.top = (pawY + offsetY) + 'px';
+
+  requestAnimationFrame(animatePaw);
+}
+
+animatePaw();
+
+const bgMusic = document.getElementById('bgMusic');
+const musicButton = document.getElementById('musicButton');
+
+musicButton.addEventListener('click', async () => {
+  if (bgMusic.paused) {
+    try {
+      await bgMusic.play();
+
+      musicButton.textContent = '❚❚ Pause';
+      musicButton.classList.add('playing');
+    } catch (error) {
+      console.log('Music could not play:', error);
+    }
+  } else {
+    bgMusic.pause();
+
+    musicButton.textContent = '▶ Play';
+    musicButton.classList.remove('playing');
+  }
+});
+</script>
+</body>
+</html>
